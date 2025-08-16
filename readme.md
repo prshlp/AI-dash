@@ -332,4 +332,4 @@ Williams College is a private liberal arts college in Williamstown, Massachusett
 
 **Built with ❤️ for the Williams College Alumni Community**
 
-*Version 1.0.0 - Initial Release*
+*Version 1.0.1 - JavaScript Fixes*
