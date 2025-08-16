@@ -17,9 +17,7 @@ class AlumniPortal {
             location: ''
         };
         
-        // Bind methods
-        this.init = this.init.bind(this);
-        this.handleNavigation = this.handleNavigation.bind(this);
+        // Bind methods to preserve 'this' context
         this.handleSearch = this.handleSearch.bind(this);
         this.sendMessage = this.sendMessage.bind(this);
         this.handleChatInput = this.handleChatInput.bind(this);
@@ -87,7 +85,7 @@ class AlumniPortal {
 
         // Filter changes
         document.querySelectorAll('.filter-select').forEach(select => {
-            select.addEventListener('change', this.handleFilterChange.bind(this));
+            select.addEventListener('change', () => this.handleFilterChange());
         });
 
         // Chat functionality
@@ -683,8 +681,19 @@ class AlumniPortal {
     }
 }
 
-// Create global instance
-window.AlumniPortal = new AlumniPortal();
+// Create global instance safely
+try {
+    window.AlumniPortal = new AlumniPortal();
+    console.log('✅ AlumniPortal instance created successfully');
+} catch (error) {
+    console.error('❌ Failed to create AlumniPortal instance:', error);
+    window.AlumniPortal = {
+        init: function() {
+            console.error('AlumniPortal failed to initialize properly');
+            alert('There was an error loading the portal. Please refresh the page.');
+        }
+    };
+}
 
 // Export for module usage if needed
 if (typeof module !== 'undefined' && module.exports) {

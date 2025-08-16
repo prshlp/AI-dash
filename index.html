@@ -223,33 +223,132 @@
 
     <!-- Dynamic Asset Loading Script -->
     <script>
+        let configAttempts = 0;
+        const maxAttempts = 30; // 3 seconds
+        
+        // Minimal fallback styles
+        const fallbackCSS = `
+            body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; background: #f7fafc; }
+            .loading-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                             background: linear-gradient(135deg, #4f46e5, #3730a3); display: flex; 
+                             flex-direction: column; align-items: center; justify-content: center; 
+                             z-index: 9999; color: white; }
+            .loading-spinner { width: 3rem; height: 3rem; border: 4px solid rgba(255,255,255,0.3); 
+                              border-left-color: white; border-radius: 50%; 
+                              animation: spin 1s linear infinite; margin-bottom: 1rem; }
+            @keyframes spin { to { transform: rotate(360deg); } }
+            .app-container { padding: 20px; max-width: 1200px; margin: 0 auto; }
+            .error-box { background: #fee; border: 1px solid #fcc; padding: 20px; border-radius: 8px; margin: 20px; }
+            .btn { background: #4f46e5; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; margin: 10px; }
+        `;
+        
+        function addFallbackStyles() {
+            const style = document.createElement('style');
+            style.textContent = fallbackCSS;
+            document.head.appendChild(style);
+        }
+        
+        function showError(message) {
+            document.getElementById('loading-screen').style.display = 'none';
+            document.getElementById('app').style.display = 'block';
+            document.getElementById('app').innerHTML = `
+                <div class="error-box">
+                    <h2>🚧 Loading Issue</h2>
+                    <p>${message}</p>
+                    <button class="btn" onclick="location.reload()">🔄 Reload</button>
+                    <button class="btn" onclick="tryAlternative()">🔧 Try Alternative</button>
+                </div>
+            `;
+        }
+        
+        function tryAlternative() {
+            // Try loading from GitHub raw files directly
+            const altBase = 'https://raw.githubusercontent.com/prshlp/AI-dash/main/';
+            
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = altBase + 'styles.css?t=' + Date.now();
+            document.head.appendChild(link);
+            
+            const script = document.createElement('script');
+            script.src = altBase + 'main.js?t=' + Date.now();
+            script.onload = () => {
+                setTimeout(() => {
+                    if (typeof AlumniPortal !== 'undefined' && AlumniPortal.init) {
+                        console.log('🚀 Initializing AlumniPortal (alternative)...');
+                        AlumniPortal.init();
+                    } else {
+                        console.error('❌ AlumniPortal not found after alternative loading:', typeof AlumniPortal);
+                        showError('Scripts loaded but AlumniPortal not found.');
+                    }
+                }, 100);
+            };
+            script.onerror = () => showError('Alternative loading also failed. Please check your connection.');
+            document.head.appendChild(script);
+        }
+        
         // Wait for CONFIG to be available, then load other assets
         function loadAssets() {
+            configAttempts++;
+            
             if (typeof CONFIG === 'undefined') {
-                setTimeout(loadAssets, 100);
-                return;
+                if (configAttempts < maxAttempts) {
+                    setTimeout(loadAssets, 100);
+                    return;
+                } else {
+                    showError('Configuration failed to load from CDN. This might be a network or CDN issue.');
+                    return;
+                }
             }
             
-            // Load CSS
+            console.log('✅ CONFIG loaded:', CONFIG);
+            
+            // Load CSS with error handling
             const link = document.createElement('link');
             link.rel = 'stylesheet';
             link.href = CONFIG.assetUrl('styles.css');
+            link.onerror = () => {
+                console.warn('❌ CSS failed from CDN, trying alternative...');
+                tryAlternative();
+            };
             document.head.appendChild(link);
             
-            // Load main JavaScript
+            // Load main JavaScript with error handling
             const script = document.createElement('script');
             script.src = CONFIG.assetUrl('main.js');
             script.onload = function() {
-                // Initialize the application once main.js is loaded
-                if (typeof AlumniPortal !== 'undefined') {
-                    AlumniPortal.init();
-                }
+                console.log('✅ JS loaded successfully');
+                
+                // Wait a moment for script execution to complete
+                setTimeout(() => {
+                    if (typeof AlumniPortal !== 'undefined' && AlumniPortal.init) {
+                        console.log('🚀 Initializing AlumniPortal...');
+                        AlumniPortal.init();
+                    } else {
+                        console.error('❌ AlumniPortal not properly loaded:', typeof AlumniPortal);
+                        showError('Main script loaded but AlumniPortal not found or malformed.');
+                    }
+                }, 100);
+            };
+            script.onerror = () => {
+                console.warn('❌ JS failed from CDN, trying alternative...');
+                tryAlternative();
             };
             document.head.appendChild(script);
         }
         
+        // Add minimal styles immediately
+        addFallbackStyles();
+        
         // Start loading assets
         loadAssets();
+        
+        // Timeout failsafe - if loading takes too long, show error
+        setTimeout(() => {
+            if (document.getElementById('loading-screen').style.display !== 'none') {
+                showError('Loading timeout - this might be a network connectivity issue.');
+            }
+        }, 10000);
     </script>
 </body>
 </html>
