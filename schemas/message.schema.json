@@ -1,0 +1,422 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/prshlp/AI-dash/schemas/message.schema.json",
+  "title": "AI Assistant Message Schema",
+  "description": "Schema for AI assistant messages and conversations in the Alumni Portal",
+  "type": "object",
+  "required": [
+    "id",
+    "conversationId",
+    "content",
+    "sender",
+    "timestamp"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique identifier for the message"
+    },
+    "conversationId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Identifier for the conversation thread"
+    },
+    "content": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 10000,
+      "description": "Message content"
+    },
+    "sender": {
+      "type": "string",
+      "enum": ["user", "ai", "system"],
+      "description": "Message sender type"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Message timestamp in ISO 8601 format"
+    },
+    "userId": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "ID of the user who sent the message (for user messages)"
+    },
+    "messageType": {
+      "type": "string",
+      "enum": [
+        "text",
+        "suggestion",
+        "error",
+        "notification",
+        "command",
+        "result"
+      ],
+      "default": "text",
+      "description": "Type of message"
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "intent": {
+          "type": "string",
+          "enum": [
+            "greeting",
+            "search_alumni",
+            "find_events",
+            "networking_help",
+            "career_advice",
+            "general_question",
+            "complaint",
+            "compliment",
+            "unknown"
+          ],
+          "description": "Detected user intent"
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Confidence score for intent detection"
+        },
+        "entities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["type", "value"],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "person_name",
+                  "company",
+                  "industry",
+                  "location",
+                  "graduation_year",
+                  "skill",
+                  "event_type",
+                  "date",
+                  "email",
+                  "phone"
+                ]
+              },
+              "value": {
+                "type": "string"
+              },
+              "startIndex": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "endIndex": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "confidence": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            }
+          },
+          "description": "Extracted entities from the message"
+        },
+        "sentiment": {
+          "type": "object",
+          "properties": {
+            "label": {
+              "type": "string",
+              "enum": ["positive", "negative", "neutral"]
+            },
+            "score": {
+              "type": "number",
+              "minimum": -1,
+              "maximum": 1
+            }
+          },
+          "description": "Sentiment analysis results"
+        },
+        "language": {
+          "type": "string",
+          "default": "en",
+          "description": "Detected language code"
+        },
+        "responseTime": {
+          "type": "number",
+          "minimum": 0,
+          "description": "AI response time in milliseconds"
+        },
+        "modelUsed": {
+          "type": "string",
+          "description": "AI model used to generate the response"
+        },
+        "tokenCount": {
+          "type": "object",
+          "properties": {
+            "input": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "output": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "total": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "description": "Token usage statistics"
+        }
+      }
+    },
+    "context": {
+      "type": "object",
+      "properties": {
+        "previousMessages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 10,
+          "description": "IDs of previous messages in the conversation for context"
+        },
+        "userProfile": {
+          "type": "object",
+          "properties": {
+            "userId": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "class": {
+              "type": "string"
+            },
+            "industry": {
+              "type": "string"
+            },
+            "location": {
+              "type": "string"
+            }
+          },
+          "description": "Relevant user profile information for context"
+        },
+        "sessionData": {
+          "type": "object",
+          "properties": {
+            "sessionId": {
+              "type": "string"
+            },
+            "startTime": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "pageContext": {
+              "type": "string",
+              "enum": ["dashboard", "directory", "events", "profile", "ai-assistant"]
+            }
+          },
+          "description": "Session and page context information"
+        }
+      }
+    },
+    "suggestions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["text"],
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "Suggested follow-up question or action"
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "search_alumni",
+              "find_events",
+              "view_profile",
+              "send_message",
+              "schedule_meeting",
+              "navigate_to_section"
+            ],
+            "description": "Action type for the suggestion"
+          },
+          "parameters": {
+            "type": "object",
+            "description": "Parameters for the suggested action"
+          }
+        }
+      },
+      "maxItems": 5,
+      "description": "Suggested follow-up actions for the user"
+    },
+    "attachments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type", "content"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "alumni_list",
+              "event_list",
+              "search_results",
+              "chart",
+              "document",
+              "link"
+            ],
+            "description": "Type of attachment"
+          },
+          "content": {
+            "type": "object",
+            "description": "Attachment content (structure varies by type)"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 100,
+            "description": "Attachment title"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 300,
+            "description": "Attachment description"
+          }
+        }
+      },
+      "description": "Message attachments (structured data, links, etc.)"
+    },
+    "feedback": {
+      "type": "object",
+      "properties": {
+        "rating": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5,
+          "description": "User rating for the AI response (1-5 stars)"
+        },
+        "helpful": {
+          "type": "boolean",
+          "description": "Whether the user found the response helpful"
+        },
+        "comment": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "User feedback comment"
+        },
+        "feedbackTimestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When feedback was provided"
+        }
+      },
+      "description": "User feedback for AI responses"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["sent", "delivered", "read", "failed"],
+      "default": "sent",
+      "description": "Message delivery status"
+    },
+    "isEdited": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the message has been edited"
+    },
+    "editHistory": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["content", "timestamp"],
+        "properties": {
+          "content": {
+            "type": "string",
+            "description": "Previous version of the message"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the edit was made"
+          }
+        }
+      },
+      "description": "History of message edits"
+    },
+    "parentMessageId": {
+      "type": "string",
+      "description": "ID of the message this is replying to"
+    },
+    "threadId": {
+      "type": "string",
+      "description": "Thread identifier for grouped messages"
+    },
+    "priority": {
+      "type": "string",
+      "enum": ["low", "normal", "high", "urgent"],
+      "default": "normal",
+      "description": "Message priority level"
+    },
+    "flags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "important",
+          "follow_up_required",
+          "contains_pii",
+          "needs_human_review",
+          "automated",
+          "urgent"
+        ]
+      },
+      "uniqueItems": true,
+      "description": "Message flags for special handling"
+    },
+    "analytics": {
+      "type": "object",
+      "properties": {
+        "readTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the message was read"
+        },
+        "responseTime": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Time taken to respond (in seconds)"
+        },
+        "clickedSuggestions": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "Indices of suggestions that were clicked"
+        },
+        "userActions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "action": {
+                "type": "string"
+              },
+              "timestamp": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "details": {
+                "type": "object"
+              }
+            }
+          },
+          "description": "User actions taken after receiving this message"
+        }
+      },
+      "description": "Analytics data for the message"
+    }
+  },
+  "additionalProperties": false
+}

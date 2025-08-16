@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alumni Portal - AI Dashboard</title>
+    <meta name="description" content="Williams College Alumni Portal with AI-powered features">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    
+    <!-- Load configuration first with explicit version -->
+    <script src="https://cdn.jsdelivr.net/gh/prshlp/AI-dash@main/config.js?v=1.0.0"></script>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-spinner"></div>
+        <p>Loading Alumni Portal...</p>
+    </div>
+
+    <!-- Main Application Container -->
+    <div id="app" class="app-container" style="display: none;">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <h1>Williams Alumni Portal</h1>
+                    <span class="beta-badge">AI-Powered</span>
+                </div>
+                <nav class="main-nav">
+                    <button class="nav-btn active" data-section="dashboard">Dashboard</button>
+                    <button class="nav-btn" data-section="directory">Directory</button>
+                    <button class="nav-btn" data-section="ai-assistant">AI Assistant</button>
+                    <button class="nav-btn" data-section="profile">Profile</button>
+                </nav>
+                <div class="user-actions">
+                    <button class="btn-secondary" id="settings-btn">Settings</button>
+                    <div class="user-avatar">
+                        <span id="user-initials">AL</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Dashboard Section -->
+            <section id="dashboard-section" class="content-section active">
+                <div class="dashboard-grid">
+                    <div class="card welcome-card">
+                        <h2>Welcome Back!</h2>
+                        <p>Your alumni network at your fingertips</p>
+                        <div class="quick-stats">
+                            <div class="stat">
+                                <span class="stat-number" id="connections-count">--</span>
+                                <span class="stat-label">Connections</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-number" id="events-count">--</span>
+                                <span class="stat-label">Upcoming Events</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card recent-activity">
+                        <h3>Recent Activity</h3>
+                        <div id="activity-feed" class="activity-list">
+                            <!-- Activity items will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <div class="card ai-insights">
+                        <h3>AI Insights</h3>
+                        <p>Discover connections and opportunities</p>
+                        <button class="btn-primary" onclick="AlumniPortal.showAIAssistant()">
+                            Ask AI Assistant
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Directory Section -->
+            <section id="directory-section" class="content-section">
+                <div class="directory-header">
+                    <h2>Alumni Directory</h2>
+                    <div class="search-controls">
+                        <input type="text" id="search-input" placeholder="Search alumni..." class="search-input">
+                        <button class="btn-primary" id="advanced-search-btn">Advanced Search</button>
+                    </div>
+                </div>
+                <div class="filters-bar">
+                    <select id="class-filter" class="filter-select">
+                        <option value="">All Classes</option>
+                    </select>
+                    <select id="industry-filter" class="filter-select">
+                        <option value="">All Industries</option>
+                    </select>
+                    <select id="location-filter" class="filter-select">
+                        <option value="">All Locations</option>
+                    </select>
+                </div>
+                <div id="directory-results" class="directory-grid">
+                    <!-- Alumni cards will be loaded here -->
+                </div>
+            </section>
+
+            <!-- AI Assistant Section -->
+            <section id="ai-assistant-section" class="content-section">
+                <div class="ai-chat-container">
+                    <div class="chat-header">
+                        <h2>AI Assistant</h2>
+                        <p>Ask questions about alumni, events, or get networking suggestions</p>
+                    </div>
+                    <div id="chat-messages" class="chat-messages">
+                        <div class="message ai-message">
+                            <div class="message-avatar">🤖</div>
+                            <div class="message-content">
+                                <p>Hello! I'm your AI assistant. I can help you:</p>
+                                <ul>
+                                    <li>Find alumni in specific industries or locations</li>
+                                    <li>Suggest networking opportunities</li>
+                                    <li>Provide information about events</li>
+                                    <li>Answer questions about the alumni network</li>
+                                </ul>
+                                <p>What would you like to know?</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat-input-container">
+                        <div class="chat-input-wrapper">
+                            <textarea id="chat-input" placeholder="Ask me anything about the alumni network..." rows="2"></textarea>
+                            <button id="send-btn" class="send-btn" disabled>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                                    <polygon points="22,2 15,22 11,13 2,9"></polygon>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="chat-suggestions">
+                            <button class="suggestion-btn" onclick="AlumniPortal.sendSuggestion('Find alumni in tech industry')">
+                                Find alumni in tech
+                            </button>
+                            <button class="suggestion-btn" onclick="AlumniPortal.sendSuggestion('Upcoming networking events')">
+                                Upcoming events
+                            </button>
+                            <button class="suggestion-btn" onclick="AlumniPortal.sendSuggestion('Alumni in my area')">
+                                Alumni near me
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Profile Section -->
+            <section id="profile-section" class="content-section">
+                <div class="profile-container">
+                    <div class="profile-header">
+                        <div class="profile-avatar-large">
+                            <span id="profile-initials">AL</span>
+                        </div>
+                        <div class="profile-info">
+                            <h2 id="profile-name">Alumni User</h2>
+                            <p id="profile-class">Class of 2020</p>
+                            <p id="profile-location">Location</p>
+                        </div>
+                        <button class="btn-secondary" id="edit-profile-btn">Edit Profile</button>
+                    </div>
+                    
+                    <div class="profile-sections">
+                        <div class="profile-section">
+                            <h3>Professional Information</h3>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <label>Current Position</label>
+                                    <span id="current-position">--</span>
+                                </div>
+                                <div class="info-item">
+                                    <label>Company</label>
+                                    <span id="current-company">--</span>
+                                </div>
+                                <div class="info-item">
+                                    <label>Industry</label>
+                                    <span id="industry">--</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="profile-section">
+                            <h3>Contact Information</h3>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <label>Email</label>
+                                    <span id="email">--</span>
+                                </div>
+                                <div class="info-item">
+                                    <label>LinkedIn</label>
+                                    <span id="linkedin">--</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Error Modal -->
+    <div id="error-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Error</h3>
+                <button class="modal-close" onclick="AlumniPortal.hideError()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="error-message"></p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-primary" onclick="AlumniPortal.hideError()">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dynamic Asset Loading Script -->
+    <script>
+        // Wait for CONFIG to be available, then load other assets
+        function loadAssets() {
+            if (typeof CONFIG === 'undefined') {
+                setTimeout(loadAssets, 100);
+                return;
+            }
+            
+            // Load CSS
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = CONFIG.assetUrl('styles.css');
+            document.head.appendChild(link);
+            
+            // Load main JavaScript
+            const script = document.createElement('script');
+            script.src = CONFIG.assetUrl('main.js');
+            script.onload = function() {
+                // Initialize the application once main.js is loaded
+                if (typeof AlumniPortal !== 'undefined') {
+                    AlumniPortal.init();
+                }
+            };
+            document.head.appendChild(script);
+        }
+        
+        // Start loading assets
+        loadAssets();
+    </script>
+</body>
+</html>
