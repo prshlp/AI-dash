@@ -3,9 +3,10 @@
  * This file manages versioning and asset loading for the portal
  */
 const CONFIG = {
-  VERSION: "1.0.1",
+  VERSION: "1.0.2",
   CDN_BASE: "https://cdn.jsdelivr.net/gh/prshlp/AI-dash@main/",
   API_URL: "https://connect.williams.edu/manage/database/gpt",
+  BUILD_TIME: "2024-01-01-12:00",
   
   /**
    * Helper function to generate versioned asset URLs
