@@ -17,10 +17,7 @@ class AlumniPortal {
             location: ''
         };
         
-        // Bind methods to preserve 'this' context
-        this.handleSearch = this.handleSearch.bind(this);
-        this.sendMessage = this.sendMessage.bind(this);
-        this.handleChatInput = this.handleChatInput.bind(this);
+        // Constructor complete - methods will be bound via arrow functions in event listeners
     }
 
     /**
@@ -80,7 +77,7 @@ class AlumniPortal {
         // Search functionality
         const searchInput = document.getElementById('search-input');
         if (searchInput) {
-            searchInput.addEventListener('input', this.debounce(this.handleSearch, 300));
+            searchInput.addEventListener('input', this.debounce((e) => this.handleSearch(e), 300));
         }
 
         // Filter changes
@@ -93,7 +90,7 @@ class AlumniPortal {
         const sendBtn = document.getElementById('send-btn');
         
         if (chatInput) {
-            chatInput.addEventListener('input', this.handleChatInput);
+            chatInput.addEventListener('input', () => this.handleChatInput());
             chatInput.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
@@ -103,7 +100,7 @@ class AlumniPortal {
         }
         
         if (sendBtn) {
-            sendBtn.addEventListener('click', this.sendMessage);
+            sendBtn.addEventListener('click', () => this.sendMessage());
         }
 
         // Settings button
