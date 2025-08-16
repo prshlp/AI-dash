@@ -350,10 +350,10 @@
                 
                 if (apiResponse.ok) {
                     const data = await apiResponse.json();
-                    const aiMessage = data.response || data.message || 'I received your message but couldn\\'t generate a response.';
+                    const aiMessage = data.response || data.message || 'I received your message but could not generate a response.';
                     response.innerHTML = '<p style="margin: 0; color: #374151;"><strong>🤖 AI Assistant:</strong> ' + aiMessage + '</p>';
                 } else {
-                    response.innerHTML = '<p style="margin: 0; color: #dc2626;">Sorry, I\\'m having trouble connecting to the AI service right now.</p>';
+                    response.innerHTML = '<p style="margin: 0; color: #dc2626;">Sorry, I am having trouble connecting to the AI service right now.</p>';
                 }
             } catch (error) {
                 response.innerHTML = '<p style="margin: 0; color: #dc2626;">Network error. Please check your connection and try again.</p>';
