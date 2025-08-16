@@ -10,16 +10,16 @@
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     
     <!-- Load configuration first with explicit version -->
-    <script src="https://cdn.jsdelivr.net/gh/prshlp/AI-dash@main/config.js?v=1.0.2&t=1704067200&_cb=forced"></script>
+    <script src="https://cdn.jsdelivr.net/gh/prshlp/AI-dash@main/config.js?v=1.0.3&t=1704067200&_cb=forced"></script>
     
     <!-- Immediate fallback config if CDN is cached -->
     <script>
         // If CONFIG doesn't load in 2 seconds, load directly from GitHub
         setTimeout(() => {
-            if (typeof CONFIG === 'undefined' || CONFIG.VERSION === '1.0.0' || CONFIG.VERSION === '1.0.1') {
+            if (typeof CONFIG === 'undefined' || CONFIG.VERSION === '1.0.0' || CONFIG.VERSION === '1.0.1' || CONFIG.VERSION === '1.0.2') {
                 console.warn('🔄 CDN cached, loading fresh config from GitHub...');
                 const script = document.createElement('script');
-                script.src = 'https://raw.githubusercontent.com/prshlp/AI-dash/main/config.js?t=' + Date.now();
+                script.src = 'https://raw.githubusercontent.com/prshlp/AI-dash/refs/heads/main/config.js?t=' + Date.now();
                 document.head.appendChild(script);
             }
         }, 2000);
@@ -366,9 +366,9 @@
             console.log('🔄 Trying alternative CDN...');
             // Try multiple CDN alternatives
             const alternatives = [
+                'https://raw.githubusercontent.com/prshlp/AI-dash/refs/heads/main/',
                 'https://raw.githubusercontent.com/prshlp/AI-dash/main/',
-                'https://cdn.jsdelivr.net/gh/prshlp/AI-dash@main/',
-                'https://gitcdn.xyz/repo/prshlp/AI-dash/main/'
+                'https://cdn.jsdelivr.net/gh/prshlp/AI-dash@main/'
             ];
             
             let attemptIndex = 0;
@@ -430,7 +430,7 @@
             console.log('✅ CONFIG loaded:', CONFIG);
             
             // Check if we got the OLD version and automatically try alternative
-            if (CONFIG.VERSION === '1.0.0' || CONFIG.VERSION === '1.0.1') {
+            if (CONFIG.VERSION === '1.0.0' || CONFIG.VERSION === '1.0.1' || CONFIG.VERSION === '1.0.2') {
                 console.warn('⚠️ Got old version from CDN, trying alternative immediately...');
                 tryAlternative();
                 return;
