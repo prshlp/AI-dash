@@ -270,8 +270,96 @@
                     <p>${message}</p>
                     <button class="btn" onclick="location.reload()">🔄 Reload</button>
                     <button class="btn" onclick="tryAlternative()">🔧 Try Alternative</button>
+                    <button class="btn" onclick="loadInlinePortal()">⚡ Load Inline Version</button>
                 </div>
             `;
+        }
+        
+        function loadInlinePortal() {
+            document.getElementById('loading-screen').style.display = 'none';
+            document.getElementById('app').style.display = 'block';
+            document.getElementById('app').innerHTML = `
+                <header style="background: white; padding: 20px; border-bottom: 1px solid #ddd; margin-bottom: 30px;">
+                    <h1 style="margin: 0; color: #4f46e5;">Williams Alumni Portal</h1>
+                    <p style="margin: 10px 0 0 0; color: #666;">Inline Mode - CDN Bypass</p>
+                </header>
+                
+                <main style="padding: 0 20px; max-width: 1200px; margin: 0 auto;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                        <div style="background: linear-gradient(135deg, #4f46e5, #3730a3); color: white; padding: 30px; border-radius: 12px;">
+                            <h2 style="margin: 0 0 10px 0;">Welcome Back!</h2>
+                            <p style="margin: 0 0 20px 0; opacity: 0.9;">Your alumni network at your fingertips</p>
+                            <div style="display: flex; gap: 30px;">
+                                <div style="text-align: center;">
+                                    <div style="font-size: 2rem; font-weight: bold; margin-bottom: 5px;">150+</div>
+                                    <div style="font-size: 0.9rem; opacity: 0.9;">Connections</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 2rem; font-weight: bold; margin-bottom: 5px;">3</div>
+                                    <div style="font-size: 0.9rem; opacity: 0.9;">Events</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="background: white; padding: 30px; border-radius: 12px; border: 1px solid #e2e8f0;">
+                            <h3 style="margin: 0 0 15px 0;">🤖 AI Assistant</h3>
+                            <p style="margin: 0 0 20px 0; color: #666;">Get instant help with networking and career guidance</p>
+                            <textarea id="inline-chat" placeholder="Ask me anything about the alumni network..." style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 10px; resize: vertical;" rows="3"></textarea>
+                            <button onclick="handleInlineChat()" style="background: #4f46e5; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer;">Send Message</button>
+                            <div id="inline-response" style="margin-top: 15px; padding: 15px; background: #f8fafc; border-radius: 8px; display: none;">
+                                <p style="margin: 0; color: #666;">Response will appear here...</p>
+                            </div>
+                        </div>
+                        
+                        <div style="background: white; padding: 30px; border-radius: 12px; border: 1px solid #e2e8f0;">
+                            <h3 style="margin: 0 0 15px 0;">🔗 Quick Links</h3>
+                            <div style="display: flex; flex-direction: column; gap: 10px;">
+                                <a href="https://alumni.williams.edu" target="_blank" style="color: #4f46e5; text-decoration: none; padding: 8px 0; border-bottom: 1px solid #f1f5f9;">📧 Alumni Directory</a>
+                                <a href="https://events.williams.edu" target="_blank" style="color: #4f46e5; text-decoration: none; padding: 8px 0; border-bottom: 1px solid #f1f5f9;">📅 Upcoming Events</a>
+                                <a href="https://connect.williams.edu" target="_blank" style="color: #4f46e5; text-decoration: none; padding: 8px 0; border-bottom: 1px solid #f1f5f9;">🌐 Williams Connect</a>
+                                <button onclick="tryAlternative()" style="background: #10b981; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; margin-top: 10px;">🔄 Retry Full Portal</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: #fef3c7; padding: 20px; border-radius: 8px; border: 1px solid #f59e0b;">
+                        <h3 style="margin: 0 0 10px 0; color: #92400e;">⚠️ CDN Loading Issue</h3>
+                        <p style="margin: 0; color: #92400e;">The full portal is temporarily using cached assets. This inline version provides core functionality while CDN updates propagate.</p>
+                    </div>
+                </main>
+            `;
+        }
+        
+        async function handleInlineChat() {
+            const input = document.getElementById('inline-chat');
+            const response = document.getElementById('inline-response');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            response.style.display = 'block';
+            response.innerHTML = '<p style="margin: 0; color: #666;">🤖 Thinking...</p>';
+            
+            try {
+                const apiResponse = await fetch('https://connect.williams.edu/manage/database/gpt', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ message: message })
+                });
+                
+                if (apiResponse.ok) {
+                    const data = await apiResponse.json();
+                    const aiMessage = data.response || data.message || 'I received your message but couldn\\'t generate a response.';
+                    response.innerHTML = '<p style="margin: 0; color: #374151;"><strong>🤖 AI Assistant:</strong> ' + aiMessage + '</p>';
+                } else {
+                    response.innerHTML = '<p style="margin: 0; color: #dc2626;">Sorry, I\\'m having trouble connecting to the AI service right now.</p>';
+                }
+            } catch (error) {
+                response.innerHTML = '<p style="margin: 0; color: #dc2626;">Network error. Please check your connection and try again.</p>';
+            }
+            
+            input.value = '';
         }
         
         function tryAlternative() {
